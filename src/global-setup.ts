@@ -1,23 +1,23 @@
-import {chromium, FullConfig} from '@playwright/test';
+import {chromium, firefox, FullConfig} from '@playwright/test';
 
 async function globalSetup(config: FullConfig) {
   console.log(JSON.stringify(config, null, 2));
-  const browser = await chromium.launch({
-    headless: false,
-    timeout: 30000,
-  });
+  const browserChrome = await chromium.launch();
+  const browserFireFox = await firefox.launch();
   try
   {
-    const page = await (await browser.newContext()).newPage();
-    await page.goto('https://playwright.dev/docs/intro');
+    const pageCh = await (await browserChrome.newContext()).newPage();
+    await pageCh.goto('https://playwright.dev/docs/intro');
+    console.log('User agent GLOBAL SETUP:', await pageCh.evaluate('navigator.userAgent'));
 
-    const user_agent = await page.evaluate('navigator.userAgent');
-    console.log('User agent GLOBAL SETUP:', user_agent);
+    const pageFF = await (await browserFireFox.newContext()).newPage();
+    await pageFF.goto('https://playwright.dev/docs/intro');
+    console.log('User agent GLOBAL SETUP:', await pageFF.evaluate('navigator.userAgent'));
   }
   finally{
-    await browser.close();
+    await browserFireFox.close();
+    await browserChrome.close();
   }
-
 }
 
 export default globalSetup;
